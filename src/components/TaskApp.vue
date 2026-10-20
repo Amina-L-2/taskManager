@@ -22,6 +22,9 @@
     </li>
   </ul>
 
+  <br/><br/>
+  <p> Total: {{ tasks.value.length }} | Pending: {{ filteredTasks.length }}</p>
+
 </div>
 
 </template>

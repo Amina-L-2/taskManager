@@ -12,7 +12,7 @@
   
   <br/><br/>
   
-  <ul>
+  <ul v-if="filteredTasks.length > 0">
     <li v-for="task in filteredTasks" :key="task.id">
       <span :class="{ done: task.completed }">{{ task.title }}</span>
       <button @click="changeStatus(task)">
@@ -21,8 +21,10 @@
     <button @click="deleteTask(task)" > 🗑 </button> 
     </li>
   </ul>
+  <p v-else>No tasks to show.</p>
 
   <br/><br/>
+
   <p> Total: {{ tasks.length }} | Pending: {{ pendingTasksCount }}</p>
 
 </div>
@@ -35,16 +37,29 @@ import { ref, computed, watch } from 'vue'
 const newTask = ref('')
 const showOnlyPending = ref(false)
 
-const tasks = ref(
-  JSON.parse(localStorage.getItem('tasks') || 'null') || //to save the tasks even when server is reloaded
-  [
-    { id: 1, title: 'Learn Vue.js  ', completed: false  },
-    { id: 2, title: 'Go for a walk  ', completed: true },
-    { id: 3, title: 'Prep Test', completed: false },
-    { id: 4, title: 'Go to gym', completed: true },
-    { id: 5, title: 'Study - optional ;) ', completed: false }
-  ]
-)
+const defaultTasks = [
+  { id: 1, title: 'Learn Vue.js', completed: false },
+  { id: 2, title: 'Go for a walk', completed: true },
+  { id: 3, title: 'Prep Test', completed: false },
+  { id: 4, title: 'Go to gym', completed: true },
+  { id: 5, title: 'Study - optional ;)', completed: false }
+]
+
+// Load saved tasks safely and show default tasks if storage is empty 
+const loadTasks = () => {
+  try {
+    const saved = JSON.parse(localStorage.getItem('tasks'))
+    if (Array.isArray(saved)) return saved
+  } 
+  catch (e) {
+  }
+  return defaultTasks
+}
+
+const tasks = ref(loadTasks())
+
+// Unique id for tasks
+let nextId = Math.max(0, ...tasks.value.map(task => task.id)) + 1
 
 const filteredTasks = computed(() => {
   if(showOnlyPending.value) {
@@ -54,12 +69,12 @@ const filteredTasks = computed(() => {
 })
 
 const addTask = () => {
-      if(!newTask.value.trim()) return 
+      const title = newTask.value.trim()
+      if (!title) return
 
-      const taskAdded = {
-        
-        id: tasks.value.length + 1,
-        title: newTask.value,
+      const taskAdded = {  
+        id: nextId++,
+        title: title,
         completed: false
       }
      

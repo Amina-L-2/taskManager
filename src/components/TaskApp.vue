@@ -2,8 +2,9 @@
 <div class="task-app">
   <h1>Gestor de Tasques</h1>
 
-  <input v-model="newTask" placeholder="Add a new task" />
-  <button @click="addTask" > Add Task</button> 
+  <TaskForm
+    @add="addTask" 
+  />
   
   <br/><br/>
 
@@ -29,8 +30,8 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import TaskList from './TaskList.vue'
+import TaskForm from './TaskForm.vue'
 
-const newTask = ref('')
 const showOnlyPending = ref(false)
 
 const defaultTasks = [
@@ -64,20 +65,14 @@ const filteredTasks = computed(() => {
   return tasks.value
 })
 
-const addTask = () => {
-      const title = newTask.value.trim()
-      if (!title) return
 
-      const taskAdded = {  
-        id: nextId++,
-        title: title,
-        completed: false
-      }
-     
-      tasks.value.push(taskAdded);
-      newTask.value = ''
+const addTask = (title) => {
+  tasks.value.push({
+    id: nextId++,
+    title,
+    completed: false
+  })
 }
-
 const deleteTask = (tasktodelete) => {
   tasks.value = tasks.value.filter(
     task => task.id !== tasktodelete.id

@@ -12,16 +12,11 @@
   
   <br/><br/>
   
-  <ul v-if="filteredTasks.length > 0">
-    <li v-for="task in filteredTasks" :key="task.id">
-      <span :class="{ done: task.completed }">{{ task.title }}</span>
-      <button @click="changeStatus(task)">
-        {{ task.completed ? 'Completed' : 'Pending' }} 
-      </button>
-    <button @click="deleteTask(task)" > 🗑 </button> 
-    </li>
-  </ul>
-  <p v-else>No tasks to show.</p>
+  <TaskList
+    :tasks="filteredTasks"
+    @toggle="changeStatus"
+    @delete="deleteTask"
+  />
 
   <br/><br/>
 
@@ -33,6 +28,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import TaskList from './TaskList.vue'
 
 const newTask = ref('')
 const showOnlyPending = ref(false)
